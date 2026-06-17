@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { BookServiceModal } from './book-service-modal'
+import { CONTACT_PHONE_DISPLAY, submitContactForm } from '@/lib/contact'
 
 type BookingContextValue = {
   /** Opens the short Free Estimate form. */
@@ -73,15 +74,29 @@ export function BookingProvider({ children }: { children: ReactNode }) {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    const form = e.currentTarget
     setSubmitting(true)
-    // Simulate request to the operations team
-    await new Promise((r) => setTimeout(r, 900))
-    setSubmitting(false)
-    setIsOpen(false)
-    toast.success('Estimate request sent', {
-      description:
-        'Thank you. Your estimate request has been sent. Our team will contact you soon.',
-    })
+    try {
+      const formData = new FormData(form)
+      formData.set('service', service)
+      await submitContactForm({
+        subject: 'New Free Estimate Request - AgroSkyTech',
+        formData,
+      })
+      setIsOpen(false)
+      form.reset()
+      toast.success('Estimate request sent', {
+        description:
+          'Thank you. Your estimate request has been sent. Our team will contact you soon.',
+      })
+    } catch (err) {
+      toast.error('Could not send your request', {
+        description:
+          err instanceof Error ? err.message : 'Please try again in a moment.',
+      })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -109,7 +124,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
                   name="phone"
                   type="tel"
                   required
-                  placeholder="(204) 555-0142"
+                  placeholder={CONTACT_PHONE_DISPLAY}
                 />
               </div>
             </div>

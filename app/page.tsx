@@ -1,4 +1,5 @@
 import { BookingProvider } from '@/components/site/booking-provider'
+import { ServiceModalProvider } from '@/components/site/service-modal-provider'
 import { CanadaMapSection } from '@/components/site/canada-map-section'
 import { Comparison } from '@/components/site/comparison'
 import { FinalCta } from '@/components/site/final-cta'
@@ -19,21 +20,23 @@ export default function Page() {
 
   return (
     <BookingProvider>
-      <SiteHeader />
-      <main>
-        <Hero />
-        <WhyUs />
-        <Services />
-        <Comparison />
-        <HowItWorks />
-        <Results />
-        <Industries />
-        <Fleet />
-        <CanadaMapSection map={canadaMap} />
-        <Testimonials />
-        <FinalCta />
-      </main>
-      <SiteFooter />
+      <ServiceModalProvider>
+        <SiteHeader />
+        <main>
+          <Hero />
+          <WhyUs />
+          <Services />
+          <Comparison />
+          <HowItWorks />
+          <Results />
+          <Industries />
+          <Fleet />
+          <CanadaMapSection map={canadaMap} />
+          <Testimonials />
+          <FinalCta />
+        </main>
+        <SiteFooter />
+      </ServiceModalProvider>
     </BookingProvider>
   )
 }

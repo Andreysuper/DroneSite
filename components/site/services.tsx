@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import Image from 'next/image'
 import {
   ArrowUpRight,
@@ -12,8 +11,7 @@ import {
   Sprout,
 } from 'lucide-react'
 import { Reveal } from './reveal'
-import { ServiceDetailModal } from './service-detail-modal'
-import { type ServiceDetail, SERVICE_DETAILS } from './services-data'
+import { useServiceModal } from './service-modal-provider'
 
 const SERVICES = [
   {
@@ -55,11 +53,7 @@ const SERVICES = [
 ]
 
 export function Services() {
-  const [activeService, setActiveService] = useState<ServiceDetail | null>(null)
-
-  function handleLearnMore(title: string) {
-    setActiveService(SERVICE_DETAILS[title] ?? null)
-  }
+  const { openService } = useServiceModal()
 
   return (
     <section id="services" className="bg-secondary py-24 sm:py-28">
@@ -101,7 +95,7 @@ export function Services() {
                   </p>
                   <button
                     type="button"
-                    onClick={() => handleLearnMore(s.title)}
+                    onClick={() => openService(s.title)}
                     className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-forest transition-colors hover:text-gold"
                   >
                     Learn More
@@ -113,13 +107,6 @@ export function Services() {
           ))}
         </div>
       </div>
-
-      <ServiceDetailModal
-        service={activeService}
-        onOpenChange={(next) => {
-          if (!next) setActiveService(null)
-        }}
-      />
     </section>
   )
 }

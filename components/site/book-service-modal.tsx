@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { CONTACT_PHONE_DISPLAY, submitContactForm } from '@/lib/contact'
 
 const SERVICE_TYPES = [
   'Crop Spraying',
@@ -147,14 +148,33 @@ export function BookServiceModal({
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    const form = e.currentTarget
     setSubmitting(true)
-    await new Promise((r) => setTimeout(r, 1000))
-    setSubmitting(false)
-    onOpenChange(false)
-    toast.success('Booking request submitted', {
-      description:
-        'Our operations team will contact you to confirm availability, product details, and field conditions.',
-    })
+    try {
+      const formData = new FormData(form)
+      // Ensure controlled selects/radios are included.
+      formData.set('serviceType', serviceType)
+      formData.set('surfaceType', surfaceType)
+      formData.set('urgency', urgency)
+      formData.set('provideProduct', provideProduct)
+      await submitContactForm({
+        subject: 'New Drone Service Booking Request - AgroSkyTech',
+        formData,
+      })
+      onOpenChange(false)
+      form.reset()
+      toast.success('Booking request submitted', {
+        description:
+          'Thank you. Your booking request has been submitted. Our operations team will contact you to confirm availability, product details, and field conditions.',
+      })
+    } catch (err) {
+      toast.error('Could not submit your booking', {
+        description:
+          err instanceof Error ? err.message : 'Please try again in a moment.',
+      })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -215,7 +235,7 @@ export function BookServiceModal({
                       name="phone"
                       type="tel"
                       required
-                      placeholder="(204) 555-0142"
+                      placeholder={CONTACT_PHONE_DISPLAY}
                     />
                   </div>
                   <div className="grid gap-1.5">
@@ -418,7 +438,8 @@ export function BookServiceModal({
                     map
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    You can also email maps or product labels after submission.
+                    You can also email maps, photos or product labels to{' '}
+                    hello@agroskytech.ca after submission.
                   </span>
                   <input
                     id="bk-files"
