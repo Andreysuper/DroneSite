@@ -26,10 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { BookServiceModal } from './book-service-modal'
-import {
-  CONTACT_PHONE_DISPLAY,
-  submitEstimate,
-} from '@/lib/contact'
+import { submitEstimate } from '@/lib/contact'
 
 type BookingContextValue = {
   /** Opens the short Free Estimate form. */
@@ -130,7 +127,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
                   name="phone"
                   type="tel"
                   required
-                  placeholder={CONTACT_PHONE_DISPLAY}
+                  placeholder="123456789"
                 />
               </div>
             </div>

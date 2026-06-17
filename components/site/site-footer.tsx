@@ -1,7 +1,6 @@
 'use client'
 
 import { Mail, MapPin, Phone } from 'lucide-react'
-import { LogoMark } from './logo-mark'
 import { useServiceModal } from './service-modal-provider'
 import {
   CONTACT_EMAIL,
@@ -66,10 +65,11 @@ export function SiteFooter() {
         <div className="grid gap-10 lg:grid-cols-4">
           {/* Brand + socials */}
           <div className="lg:col-span-2 lg:max-w-sm">
-            <div className="flex items-center gap-2.5">
-              <LogoMark className="size-10" />
-              <span className="text-lg font-semibold">
-                AgroSky<span className="text-gold">Tech</span>
+            <div className="flex items-center">
+              <span className="text-xl font-bold tracking-tight">
+                <span className="font-normal text-cream">AGRO</span>
+                <span className="text-cream">SKY</span>
+                <span className="text-gold">TECH</span>
               </span>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream/65">
