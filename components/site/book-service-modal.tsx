@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { CONTACT_PHONE_DISPLAY, submitContactForm } from '@/lib/contact'
+import { CONTACT_PHONE_DISPLAY, submitBooking } from '@/lib/contact'
 
 const SERVICE_TYPES = [
   'Crop Spraying',
@@ -157,21 +157,16 @@ export function BookServiceModal({
       formData.set('surfaceType', surfaceType)
       formData.set('urgency', urgency)
       formData.set('provideProduct', provideProduct)
-      await submitContactForm({
-        subject: 'New Drone Service Booking Request - AgroSkyTech',
-        formData,
-      })
+      await submitBooking(formData)
       onOpenChange(false)
       form.reset()
-      toast.success('Booking request submitted', {
-        description:
-          'Thank you. Your booking request has been submitted. Our operations team will contact you to confirm availability, product details, and field conditions.',
-      })
+      toast.success('Thank you. Your booking request has been submitted.')
     } catch (err) {
-      toast.error('Could not submit your booking', {
-        description:
-          err instanceof Error ? err.message : 'Please try again in a moment.',
-      })
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : 'Unable to send request. Please try again later.',
+      )
     } finally {
       setSubmitting(false)
     }
