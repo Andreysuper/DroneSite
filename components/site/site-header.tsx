@@ -5,7 +5,6 @@ import { ArrowRight, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useBooking } from './booking-provider'
-import { LogoMark } from './logo-mark'
 
 const NAV = [
   { label: 'Services', href: '#services' },
@@ -43,9 +42,10 @@ export function SiteHeader() {
           className="flex items-center gap-2.5 text-cream"
           aria-label="AgroSkyTech home"
         >
-          <LogoMark className="size-11" />
-          <span className="text-xl font-semibold tracking-tight">
-            AgroSky<span className="text-gold">Tech</span>
+          <span className="text-2xl font-bold tracking-tight">
+            <span className="font-normal text-cream">AGRO</span>
+            <span className="text-cream">SKY</span>
+            <span className="text-gold">TECH</span>
           </span>
         </a>
 

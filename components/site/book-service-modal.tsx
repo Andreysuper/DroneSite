@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { CONTACT_PHONE_DISPLAY, submitBooking } from '@/lib/contact'
+import { submitBooking } from '@/lib/contact'
 
 const SERVICE_TYPES = [
   'Crop Spraying',
@@ -230,7 +230,7 @@ export function BookServiceModal({
                       name="phone"
                       type="tel"
                       required
-                      placeholder={CONTACT_PHONE_DISPLAY}
+                      placeholder="123456789"
                     />
                   </div>
                   <div className="grid gap-1.5">
