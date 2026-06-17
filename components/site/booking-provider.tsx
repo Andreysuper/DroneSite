@@ -26,7 +26,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { BookServiceModal } from './book-service-modal'
-import { CONTACT_PHONE_DISPLAY, submitContactForm } from '@/lib/contact'
+import {
+  CONTACT_PHONE_DISPLAY,
+  submitEstimate,
+} from '@/lib/contact'
 
 type BookingContextValue = {
   /** Opens the short Free Estimate form. */
@@ -77,23 +80,26 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     const form = e.currentTarget
     setSubmitting(true)
     try {
-      const formData = new FormData(form)
-      formData.set('service', service)
-      await submitContactForm({
-        subject: 'New Free Estimate Request - AgroSkyTech',
-        formData,
+      const fd = new FormData(form)
+      await submitEstimate({
+        name: String(fd.get('name') ?? ''),
+        phone: String(fd.get('phone') ?? ''),
+        email: String(fd.get('email') ?? ''),
+        service,
+        fieldSize: String(fd.get('fieldSize') ?? ''),
+        location: String(fd.get('location') ?? ''),
+        date: String(fd.get('date') ?? ''),
+        message: String(fd.get('message') ?? ''),
       })
       setIsOpen(false)
       form.reset()
-      toast.success('Estimate request sent', {
-        description:
-          'Thank you. Your estimate request has been sent. Our team will contact you soon.',
-      })
+      toast.success('Thank you. Your estimate request has been sent.')
     } catch (err) {
-      toast.error('Could not send your request', {
-        description:
-          err instanceof Error ? err.message : 'Please try again in a moment.',
-      })
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : 'Unable to send request. Please try again later.',
+      )
     } finally {
       setSubmitting(false)
     }
