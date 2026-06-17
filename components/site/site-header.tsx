@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Menu, Plane, X } from 'lucide-react'
+import { ArrowRight, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useBooking } from './booking-provider'
+import { LogoMark } from './logo-mark'
 
 const NAV = [
   { label: 'Services', href: '#services' },
@@ -32,30 +33,28 @@ export function SiteHeader() {
       className={cn(
         'fixed inset-x-0 top-0 z-50 transition-all duration-300',
         scrolled
-          ? 'glass-dark border-b border-white/10 py-3'
-          : 'bg-transparent py-5',
+          ? 'glass-dark border-b border-white/10 py-3.5'
+          : 'bg-transparent py-6',
       )}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <a
           href="#top"
-          className="flex items-center gap-2 text-cream"
+          className="flex items-center gap-2.5 text-cream"
           aria-label="AgroSkyTech home"
         >
-          <span className="flex size-9 items-center justify-center rounded-lg bg-forest text-primary-foreground">
-            <Plane className="size-5 -rotate-45" aria-hidden />
-          </span>
-          <span className="text-lg font-semibold tracking-tight">
+          <LogoMark className="size-11" />
+          <span className="text-xl font-semibold tracking-tight">
             AgroSky<span className="text-gold">Tech</span>
           </span>
         </a>
 
-        <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-9 lg:flex" aria-label="Primary">
           {NAV.map((item) => (
             <a
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-cream/80 transition-colors hover:text-gold"
+              className="text-[0.95rem] font-medium text-cream/85 transition-colors hover:text-gold"
             >
               {item.label}
             </a>
@@ -64,10 +63,12 @@ export function SiteHeader() {
 
         <div className="hidden lg:block">
           <Button
+            size="lg"
             onClick={() => openEstimate()}
-            className="bg-gold text-accent-foreground hover:bg-gold/90"
+            className="h-12 rounded-full bg-gold px-7 text-base font-bold text-accent-foreground shadow-lg shadow-gold/30 transition-all duration-200 hover:-translate-y-0.5 hover:bg-gold/90 hover:shadow-xl hover:shadow-gold/40"
           >
             Get Free Estimate
+            <ArrowRight className="size-4" aria-hidden />
           </Button>
         </div>
 

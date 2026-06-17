@@ -1,4 +1,5 @@
-import { Camera, Globe, Mail, MapPin, Phone, Plane, Users, Video } from 'lucide-react'
+import { Camera, Globe, Mail, MapPin, Phone, Users, Video } from 'lucide-react'
+import { LogoMark } from './logo-mark'
 
 const COLUMNS = [
   {
@@ -31,10 +32,8 @@ export function SiteFooter() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-4">
           <div className="lg:col-span-1">
-            <div className="flex items-center gap-2">
-              <span className="flex size-9 items-center justify-center rounded-lg bg-forest text-primary-foreground">
-                <Plane className="size-5 -rotate-45" aria-hidden />
-              </span>
+            <div className="flex items-center gap-2.5">
+              <LogoMark className="size-10" />
               <span className="text-lg font-semibold">
                 AgroSky<span className="text-gold">Tech</span>
               </span>
