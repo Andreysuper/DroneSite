@@ -28,22 +28,25 @@ export function Hero() {
         style={{ transform: `translateY(${scrollY * 0.15}px) scale(1.08)` }}
       >
         <Image
-          src="/images/hero-drone-spraying.png"
-          alt="Agricultural spraying drone treating Canadian farmland at sunrise"
+          src="/images/hero-drone-spraying-v2.png"
+          alt="Agricultural drone spraying lush Canadian crop fields at golden-hour sunrise"
           fill
           priority
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-charcoal/98 via-charcoal/85 to-charcoal/45" />
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/30 to-charcoal/55" />
+        {/* Subtle dark scrim to keep the image bright while lifting contrast */}
+        <div className="absolute inset-0 bg-charcoal/25" />
+        {/* Focused gradient behind the text column only */}
+        <div className="absolute inset-0 bg-gradient-to-r from-charcoal/85 via-charcoal/45 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-charcoal/70 to-transparent" />
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pt-24 pb-24 sm:px-6 lg:px-12 lg:pt-28 xl:pl-20">
         <div className="max-w-2xl">
-          <h1 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-cream sm:text-5xl lg:text-6xl drop-shadow-sm">
+          <h1 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-cream sm:text-5xl lg:text-6xl drop-shadow-md">
             Professional Drone Services for Agriculture
           </h1>
-          <p className="mt-6 max-w-xl text-pretty text-lg leading-relaxed text-cream/85">
+          <p className="mt-6 max-w-xl text-pretty text-lg leading-relaxed text-cream/90 drop-shadow-sm">
             Precision spraying, irrigation, fertilization, and crop treatment
             for higher yields and lower operating costs — delivered by our own
             fleet and certified operators.
