@@ -16,7 +16,9 @@ export function MessagesClient({ threads }: MessagesClientProps) {
   const sorted = [...threads].sort((a, b) =>
     b.updatedAt.localeCompare(a.updatedAt),
   )
-  const [activeId, setActiveId] = useState(sorted[0]?.id ?? null)
+  const [activeId, setActiveId] = useState<string | null>(
+    sorted[0]?.id ?? null,
+  )
   /** Locally appended replies, keyed by thread — demo only, not persisted. */
   const [drafts, setDrafts] = useState<Record<string, string[]>>({})
   const [input, setInput] = useState('')

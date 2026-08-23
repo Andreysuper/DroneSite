@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { StatusBadge } from '@/components/portal/status-badge'
 import { formatDate } from '@/lib/portal/demo-data'
-import type { Field, ServiceOrder } from '@/lib/portal/types'
+import type { Field, ServiceOrder, ServiceStatus } from '@/lib/portal/types'
 import { cn } from '@/lib/utils'
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -84,7 +84,7 @@ export function ScheduleCalendar({ services, fields }: ScheduleCalendarProps) {
   const upcoming = useMemo(
     () =>
       services
-        .filter((s) => s.status !== 'complete' && s.status !== 'cancelled')
+        .filter((s) => s.status !== 'completed' && s.status !== 'cancelled')
         .sort((a, b) => a.scheduledDate.localeCompare(b.scheduledDate))
         .slice(0, 5),
     [services],

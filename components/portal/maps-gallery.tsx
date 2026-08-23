@@ -90,7 +90,13 @@ export function MapsGallery({
           </Label>
           <Select value={fieldId} onValueChange={setFieldId}>
             <SelectTrigger id="map-field">
-              <SelectValue placeholder="All fields" />
+              <SelectValue placeholder="All fields">
+                {(value) =>
+                  value === 'all'
+                    ? 'All fields'
+                    : (fields.find((f) => f.id === value)?.name ?? 'All fields')
+                }
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All fields</SelectItem>

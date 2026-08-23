@@ -96,7 +96,9 @@ export function DocumentsBrowser({ documents, fields }: DocumentsBrowserProps) {
           </Label>
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger id="doc-category">
-              <SelectValue placeholder="All categories" />
+              <SelectValue placeholder="All categories">
+                {(value) => (value === 'all' ? 'All categories' : value)}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All categories</SelectItem>
@@ -114,7 +116,13 @@ export function DocumentsBrowser({ documents, fields }: DocumentsBrowserProps) {
           </Label>
           <Select value={fieldId} onValueChange={setFieldId}>
             <SelectTrigger id="doc-field">
-              <SelectValue placeholder="All fields" />
+              <SelectValue placeholder="All fields">
+                {(value) =>
+                  value === 'all'
+                    ? 'All fields'
+                    : (fields.find((f) => f.id === value)?.name ?? 'All fields')
+                }
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All fields</SelectItem>

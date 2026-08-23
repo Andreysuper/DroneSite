@@ -17,20 +17,31 @@ function hashSeed(seed: string): number {
   return h >>> 0
 }
 
-function makeRandom(seed: string) {
-  let state = hashSeed(seed) || 1
-  return () => {
-    state += 0x6d2b79f5
-    let t = state
+/**
+ * Index-addressed noise. This is intentionally *stateless*: value `n` depends
+ * only on the seed and `n`, never on how many times the function was called
+ * before. A stateful counter would make every layer's geometry depend on the
+ * order layers happened to render in, which desynchronises SSR from hydration.
+ */
+type Rand = (n: number) => number
+
+function makeRandom(seed: string): Rand {
+  const base = hashSeed(seed) || 1
+  return (n: number) => {
+    let t = (base + n * 0x6d2b79f5) >>> 0
     t = Math.imul(t ^ (t >>> 15), t | 1)
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296
   }
 }
 
-/** Irregular closed blob used for vigour / stress / prescription zones. */
+/**
+ * Irregular closed blob used for vigour / stress / prescription zones.
+ * `slot` reserves a unique block of the noise sequence for this shape.
+ */
 function blobPath(
-  rand: () => number,
+  rand: Rand,
+  slot: number,
   cx: number,
   cy: number,
   radius: number,
@@ -39,7 +50,7 @@ function blobPath(
   const coords: Array<[number, number]> = []
   for (let i = 0; i < points; i += 1) {
     const angle = (i / points) * Math.PI * 2
-    const r = radius * (0.62 + rand() * 0.58)
+    const r = radius * (0.62 + rand(slot * 16 + i) * 0.58)
     coords.push([cx + Math.cos(angle) * r * 1.35, cy + Math.sin(angle) * r])
   }
   // Closed Catmull-Rom-ish smoothing via quadratic midpoints.
@@ -90,12 +101,12 @@ export function FieldMapView({
   // Field boundary — a slightly irregular quadrilateral so it reads as a real
   // surveyed parcel rather than a perfect rectangle.
   const inset = 16
-  const jitter = () => (rand() - 0.5) * 14
+  const jitter = (n: number) => (rand(n) - 0.5) * 14
   const boundary = [
-    [inset + jitter(), inset + jitter()],
-    [400 - inset + jitter(), inset + jitter() * 0.6],
-    [400 - inset + jitter() * 0.8, 300 - inset + jitter()],
-    [inset + jitter(), 300 - inset + jitter() * 0.6],
+    [inset + jitter(0), inset + jitter(1)],
+    [400 - inset + jitter(2), inset + jitter(3) * 0.6],
+    [400 - inset + jitter(4) * 0.8, 300 - inset + jitter(5)],
+    [inset + jitter(6), 300 - inset + jitter(7) * 0.6],
   ]
   const boundaryPath = `M ${boundary.map(([x, y]) => `${x} ${y}`).join(' L ')} Z`
 
@@ -122,9 +133,9 @@ export function FieldMapView({
       {Array.from({ length: 26 }).map((_, i) => (
         <circle
           key={`grain-${i}`}
-          cx={rand() * 400}
-          cy={rand() * 300}
-          r={rand() * 26 + 6}
+          cx={rand(100 + i * 3) * 400}
+          cy={rand(101 + i * 3) * 300}
+          r={rand(102 + i * 3) * 26 + 6}
           fill="#2a3522"
           opacity={0.35}
         />
@@ -167,7 +178,7 @@ export function FieldMapView({
 
 /* ----------------------------- variant layers ---------------------------- */
 
-function RgbLayer({ rand }: { rand: () => number }) {
+function RgbLayer({ rand }: { rand: Rand }) {
   const rowGap = 7
   return (
     <>
@@ -176,8 +187,14 @@ function RgbLayer({ rand }: { rand: () => number }) {
       {Array.from({ length: 9 }).map((_, i) => (
         <path
           key={`mottle-${i}`}
-          d={blobPath(rand, rand() * 400, rand() * 300, 34 + rand() * 46)}
-          fill={rand() > 0.5 ? '#5c7f26' : '#3d5a19'}
+          d={blobPath(
+            rand,
+            60 + i,
+            rand(300 + i * 4) * 400,
+            rand(301 + i * 4) * 300,
+            34 + rand(302 + i * 4) * 46,
+          )}
+          fill={rand(303 + i * 4) > 0.5 ? '#5c7f26' : '#3d5a19'}
           opacity={0.55}
         />
       ))}
@@ -216,15 +233,14 @@ function RampLayer({
   rand,
   ramp,
 }: {
-  rand: () => number
+  rand: Rand
   ramp: readonly string[]
 }) {
-  const zones = Array.from({ length: 16 }).map(() => ({
-    cx: rand() * 400,
-    cy: rand() * 300,
-    r: 38 + rand() * 62,
-    color: ramp[Math.floor(rand() * ramp.length)],
-    d: 0,
+  const zones = Array.from({ length: 16 }).map((_, i) => ({
+    cx: rand(400 + i * 4) * 400,
+    cy: rand(401 + i * 4) * 300,
+    r: 38 + rand(402 + i * 4) * 62,
+    color: ramp[Math.floor(rand(403 + i * 4) * ramp.length)],
   }))
   return (
     <>
@@ -232,7 +248,7 @@ function RampLayer({
       {zones.map((z, i) => (
         <path
           key={`zone-${i}`}
-          d={blobPath(rand, z.cx, z.cy, z.r)}
+          d={blobPath(rand, 80 + i, z.cx, z.cy, z.r)}
           fill={z.color}
           opacity={0.78}
         />
@@ -257,7 +273,7 @@ function CoverageLayer({
   rand,
   uid,
 }: {
-  rand: () => number
+  rand: Rand
   uid: string
 }) {
   const swathH = 17
@@ -268,7 +284,13 @@ function CoverageLayer({
       {Array.from({ length: 7 }).map((_, i) => (
         <path
           key={`base-${i}`}
-          d={blobPath(rand, rand() * 400, rand() * 300, 40 + rand() * 50)}
+          d={blobPath(
+            rand,
+            120 + i,
+            rand(500 + i * 3) * 400,
+            rand(501 + i * 3) * 300,
+            40 + rand(502 + i * 3) * 50,
+          )}
           fill="#2f3a24"
           opacity={0.7}
         />
@@ -306,7 +328,7 @@ function CoverageLayer({
   )
 }
 
-function TreatmentLayer({ rand }: { rand: () => number }) {
+function TreatmentLayer({ rand }: { rand: Rand }) {
   const cols = 5
   const rows = 4
   const cw = 400 / cols
@@ -322,7 +344,13 @@ function TreatmentLayer({ rand }: { rand: () => number }) {
             y={r * ch}
             width={cw}
             height={ch}
-            fill={TREATMENT_RAMP[Math.floor(rand() * TREATMENT_RAMP.length)]}
+            fill={
+              TREATMENT_RAMP[
+                Math.floor(
+                  rand(600 + r * cols + c) * TREATMENT_RAMP.length,
+                )
+              ]
+            }
             stroke="#0b1210"
             strokeWidth={1.2}
           />
@@ -332,12 +360,12 @@ function TreatmentLayer({ rand }: { rand: () => number }) {
   )
 }
 
-function ProblemLayer({ rand }: { rand: () => number }) {
-  const patches = Array.from({ length: 5 }).map(() => ({
-    cx: 50 + rand() * 300,
-    cy: 45 + rand() * 210,
-    r: 24 + rand() * 30,
-    hot: rand() > 0.45,
+function ProblemLayer({ rand }: { rand: Rand }) {
+  const patches = Array.from({ length: 5 }).map((_, i) => ({
+    cx: 50 + rand(700 + i * 4) * 300,
+    cy: 45 + rand(701 + i * 4) * 210,
+    r: 24 + rand(702 + i * 4) * 30,
+    hot: rand(703 + i * 4) > 0.45,
   }))
   return (
     <>
@@ -345,13 +373,19 @@ function ProblemLayer({ rand }: { rand: () => number }) {
       {Array.from({ length: 8 }).map((_, i) => (
         <path
           key={`bg-${i}`}
-          d={blobPath(rand, rand() * 400, rand() * 300, 36 + rand() * 44)}
+          d={blobPath(
+            rand,
+            160 + i,
+            rand(800 + i * 3) * 400,
+            rand(801 + i * 3) * 300,
+            36 + rand(802 + i * 3) * 44,
+          )}
           fill="#46523c"
           opacity={0.75}
         />
       ))}
       {patches.map((p, i) => {
-        const d = blobPath(rand, p.cx, p.cy, p.r)
+        const d = blobPath(rand, 200 + i, p.cx, p.cy, p.r)
         return (
           <g key={`patch-${i}`}>
             <path
