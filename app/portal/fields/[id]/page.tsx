@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { ArrowLeft, ArrowUpRight, CalendarPlus, MapPin } from 'lucide-react'
@@ -11,6 +10,7 @@ import {
   getFieldMaps,
   getServiceOrders,
 } from '@/lib/portal/demo-data'
+import { FieldMapView } from '@/components/portal/field-map'
 import { PageHeader } from '@/components/portal/page-header'
 import { StatusBadge } from '@/components/portal/status-badge'
 import { Button } from '@/components/ui/button'
@@ -64,7 +64,7 @@ export default async function FieldDetailPage({
         title={field.name}
         subtitle={`${field.acres} acres · ${field.cropType} · ${field.farm}`}
         action={
-          <Button render={<Link href="/portal/book" />}>
+          <Button nativeButton={false} render={<Link href="/portal/book" />}>
             <CalendarPlus className="size-4" aria-hidden />
             Book service
           </Button>
@@ -75,13 +75,10 @@ export default async function FieldDetailPage({
         {/* Map + info */}
         <Card className="overflow-hidden border-border/60 p-0 lg:col-span-2">
           <div className="relative aspect-[16/9] bg-muted">
-            <Image
-              src={field.mapImage}
-              alt={`Aerial map of ${field.name}`}
-              fill
-              sizes="(max-width: 1024px) 100vw, 66vw"
-              className="object-cover"
-              priority
+            <FieldMapView
+              variant={field.mapImage}
+              seed={field.id}
+              showDecorations
             />
           </div>
           <dl className="grid gap-x-6 gap-y-4 p-6 sm:grid-cols-2">
@@ -236,13 +233,7 @@ export default async function FieldDetailPage({
               <li key={m.id}>
                 <Card className="overflow-hidden border-border/60 p-0">
                   <div className="relative aspect-[16/10] bg-muted">
-                    <Image
-                      src={m.image}
-                      alt={`${m.type} for ${field.name}`}
-                      fill
-                      sizes="(max-width: 640px) 100vw, 33vw"
-                      className="object-cover"
-                    />
+                    <FieldMapView variant={m.image} seed={m.id} />
                   </div>
                   <div className="flex flex-col gap-1 p-4">
                     <p className="font-semibold">{m.type}</p>

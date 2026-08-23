@@ -92,8 +92,17 @@ export type Field = {
   cropType: string
   notes?: string
   lastServiceDate?: string
-  mapImage: string
+  mapImage: MapVariant
 }
+
+/** Which analytics layer a generated field map renders. */
+export type MapVariant =
+  | 'rgb'
+  | 'ndvi'
+  | 'health'
+  | 'coverage'
+  | 'treatment'
+  | 'problem'
 
 export type ServiceOrder = {
   id: string
@@ -119,8 +128,8 @@ export type ServiceOrder = {
     weather: string
     acresTreated: number
     notes: string
-    coverageMap: string
-    photos: string[]
+    coverageMap: MapVariant
+    photos: MapVariant[]
   }
 }
 
@@ -133,7 +142,7 @@ export type FieldMap = {
   mission: string
   resolution: string
   analysisStatus: 'complete' | 'processing' | 'queued'
-  image: string
+  image: MapVariant
   fileSize: string
 }
 

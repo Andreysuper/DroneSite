@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import {
@@ -16,6 +15,7 @@ import {
   getField,
   getServiceOrder,
 } from '@/lib/portal/demo-data'
+import { FieldMapView } from '@/components/portal/field-map'
 import { PageHeader } from '@/components/portal/page-header'
 import { StatusBadge } from '@/components/portal/status-badge'
 import { ServiceTracker } from '@/components/portal/service-tracker'
@@ -100,6 +100,7 @@ export default async function ServiceDetailPage({
 
           <Button
             variant="outline"
+            nativeButton={false}
             render={
               <Link href="/portal/messages">
                 <MessageSquare className="size-4" aria-hidden />
@@ -116,13 +117,7 @@ export default async function ServiceDetailPage({
           {field && (
             <>
               <div className="relative aspect-4/3 overflow-hidden rounded-lg bg-muted">
-                <Image
-                  src={field.mapImage}
-                  alt={`Aerial map of ${field.name}`}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 320px"
-                  className="object-cover"
-                />
+                <FieldMapView variant={field.mapImage} seed={field.id} />
               </div>
               <dl className="flex flex-col gap-3">
                 <Row label="Name" value={field.name} />
@@ -136,6 +131,7 @@ export default async function ServiceDetailPage({
               <Button
                 variant="outline"
                 size="sm"
+                nativeButton={false}
                 render={
                   <Link href={`/portal/fields/${field.id}`}>Open Field</Link>
                 }
@@ -197,12 +193,9 @@ export default async function ServiceDetailPage({
             <div className="grid gap-3 sm:grid-cols-3">
               <figure className="flex flex-col gap-1.5">
                 <div className="relative aspect-4/3 overflow-hidden rounded-lg bg-muted">
-                  <Image
-                    src={done.coverageMap}
-                    alt={`Spray coverage map for ${svc.reference}`}
-                    fill
-                    sizes="(max-width: 640px) 100vw, 240px"
-                    className="object-cover"
+                  <FieldMapView
+                    variant={done.coverageMap}
+                    seed={`${svc.id}-coverage`}
                   />
                 </div>
                 <figcaption className="text-xs text-muted-foreground">
@@ -212,12 +205,9 @@ export default async function ServiceDetailPage({
               {done.photos.map((photo, i) => (
                 <figure key={photo + i} className="flex flex-col gap-1.5">
                   <div className="relative aspect-4/3 overflow-hidden rounded-lg bg-muted">
-                    <Image
-                      src={photo}
-                      alt={`Field photo ${i + 1} from ${svc.reference}`}
-                      fill
-                      sizes="(max-width: 640px) 100vw, 240px"
-                      className="object-cover"
+                    <FieldMapView
+                      variant={photo}
+                      seed={`${svc.id}-photo-${i}`}
                     />
                   </div>
                   <figcaption className="text-xs text-muted-foreground">

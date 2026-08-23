@@ -211,6 +211,7 @@ export function PortalTopbar({
       <Button
         variant="ghost"
         size="icon"
+        nativeButton={false}
         render={
           <Link href="/portal/support" aria-label="Support and help">
             <CircleHelp className="size-[18px]" aria-hidden />

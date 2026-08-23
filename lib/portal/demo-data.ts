@@ -68,7 +68,7 @@ export const FIELDS: Field[] = [
     cropType: 'Canola',
     notes: 'Slight slope on the west edge. Power line along the north boundary.',
     lastServiceDate: '2026-06-10',
-    mapImage: '/images/portal/map-rgb.png',
+    mapImage: 'rgb',
   },
   {
     id: 'fld_south_wheat',
@@ -81,7 +81,7 @@ export const FIELDS: Field[] = [
     cropType: 'Spring Wheat',
     notes: 'Large contiguous block. Ideal for high-throughput missions.',
     lastServiceDate: '2026-05-28',
-    mapImage: '/images/portal/map-ndvi.png',
+    mapImage: 'ndvi',
   },
   {
     id: 'fld_east_soy',
@@ -93,7 +93,7 @@ export const FIELDS: Field[] = [
     acres: 220,
     cropType: 'Soybeans',
     lastServiceDate: '2026-06-02',
-    mapImage: '/images/portal/map-health.png',
+    mapImage: 'health',
   },
   {
     id: 'fld_west_corn',
@@ -106,7 +106,7 @@ export const FIELDS: Field[] = [
     cropType: 'Grain Corn',
     notes: 'Irrigation pivot in the south-east corner.',
     lastServiceDate: '2026-05-19',
-    mapImage: '/images/portal/map-coverage.png',
+    mapImage: 'coverage',
   },
   {
     id: 'fld_home_quarter',
@@ -118,7 +118,7 @@ export const FIELDS: Field[] = [
     acres: 160,
     cropType: 'Oats',
     lastServiceDate: '2026-04-30',
-    mapImage: '/images/portal/map-rgb.png',
+    mapImage: 'rgb',
   },
   {
     id: 'fld_river_flats',
@@ -130,7 +130,7 @@ export const FIELDS: Field[] = [
     acres: 250,
     cropType: 'Barley',
     notes: 'Low-lying, holds moisture after heavy rain.',
-    mapImage: '/images/portal/map-problem.png',
+    mapImage: 'problem',
   },
 ]
 
@@ -210,8 +210,8 @@ export const SERVICE_ORDERS: ServiceOrder[] = [
       acresTreated: 320,
       notes:
         'Full coverage achieved. Buffer zone respected along the north power line. No drift observed.',
-      coverageMap: '/images/portal/map-coverage.png',
-      photos: ['/images/portal/map-rgb.png', '/images/portal/map-health.png'],
+      coverageMap: 'coverage',
+      photos: ['rgb', 'health'],
     },
   },
   {
@@ -236,8 +236,8 @@ export const SERVICE_ORDERS: ServiceOrder[] = [
       weather: '21°C, wind 12 km/h SW, humidity 55%',
       acresTreated: 220,
       notes: 'Applied in two passes to limit runoff on the eastern slope.',
-      coverageMap: '/images/portal/map-treatment.png',
-      photos: ['/images/portal/map-treatment.png'],
+      coverageMap: 'treatment',
+      photos: ['treatment'],
     },
   },
   {
@@ -262,8 +262,8 @@ export const SERVICE_ORDERS: ServiceOrder[] = [
       acresTreated: 480,
       notes:
         'Two low-vigour zones flagged in the south-west corner for follow-up scouting.',
-      coverageMap: '/images/portal/map-ndvi.png',
-      photos: ['/images/portal/map-ndvi.png', '/images/portal/map-problem.png'],
+      coverageMap: 'ndvi',
+      photos: ['ndvi', 'problem'],
     },
   },
   {
@@ -290,7 +290,7 @@ export const FIELD_MAPS: FieldMap[] = [
     mission: 'AST-2026-0071 · Agras T50',
     resolution: '2.4 cm/px',
     analysisStatus: 'complete',
-    image: '/images/portal/map-coverage.png',
+    image: 'coverage',
     fileSize: '18.4 MB',
   },
   {
@@ -302,7 +302,7 @@ export const FIELD_MAPS: FieldMap[] = [
     mission: 'AST-2026-0052 · Mavic 3M',
     resolution: '3.1 cm/px',
     analysisStatus: 'complete',
-    image: '/images/portal/map-ndvi.png',
+    image: 'ndvi',
     fileSize: '24.7 MB',
   },
   {
@@ -314,7 +314,7 @@ export const FIELD_MAPS: FieldMap[] = [
     mission: 'AST-2026-0064 · Mavic 3M',
     resolution: '2.8 cm/px',
     analysisStatus: 'complete',
-    image: '/images/portal/map-health.png',
+    image: 'health',
     fileSize: '15.2 MB',
   },
   {
@@ -326,7 +326,7 @@ export const FIELD_MAPS: FieldMap[] = [
     mission: 'AST-2026-0071 · Mavic 3M',
     resolution: '1.9 cm/px',
     analysisStatus: 'complete',
-    image: '/images/portal/map-rgb.png',
+    image: 'rgb',
     fileSize: '31.6 MB',
   },
   {
@@ -338,7 +338,7 @@ export const FIELD_MAPS: FieldMap[] = [
     mission: 'AST-2026-0064 · Agras T50',
     resolution: '2.8 cm/px',
     analysisStatus: 'complete',
-    image: '/images/portal/map-treatment.png',
+    image: 'treatment',
     fileSize: '12.9 MB',
   },
   {
@@ -350,7 +350,7 @@ export const FIELD_MAPS: FieldMap[] = [
     mission: 'AST-2026-0039 · Mavic 3M',
     resolution: '3.4 cm/px',
     analysisStatus: 'complete',
-    image: '/images/portal/map-problem.png',
+    image: 'problem',
     fileSize: '9.8 MB',
   },
   {
@@ -362,7 +362,7 @@ export const FIELD_MAPS: FieldMap[] = [
     mission: 'AST-2026-0052 · Analysis',
     resolution: '3.1 cm/px',
     analysisStatus: 'processing',
-    image: '/images/portal/map-treatment.png',
+    image: 'treatment',
     fileSize: '4.2 MB',
   },
 ]

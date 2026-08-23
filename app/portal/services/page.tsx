@@ -22,6 +22,7 @@ export default async function ServicesPage() {
         subtitle="Every service order for this property — current, upcoming and historical."
         action={
           <Button
+            nativeButton={false}
             render={
               <Link href="/portal/book">
                 <PlusCircle className="size-4" aria-hidden />

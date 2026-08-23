@@ -89,6 +89,7 @@ export default async function PortalOverviewPage() {
               </dl>
 
               <Button
+                nativeButton={false}
                 render={
                   <Link href={`/portal/services/${next.id}`}>
                     View Details
@@ -100,6 +101,7 @@ export default async function PortalOverviewPage() {
             </>
           ) : (
             <Button
+              nativeButton={false}
               render={<Link href="/portal/book">Book a service</Link>}
               className="w-fit bg-gold font-semibold text-accent-foreground hover:bg-gold/90"
             />
@@ -126,6 +128,7 @@ export default async function PortalOverviewPage() {
           </div>
           <Button
             variant="outline"
+            nativeButton={false}
             render={
               <Link href="/portal/invoices">
                 View Invoice

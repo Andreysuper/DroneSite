@@ -172,6 +172,7 @@ export function ServicesList({
               <div className="flex flex-wrap gap-2 border-t pt-4">
                 <Button
                   size="sm"
+                  nativeButton={false}
                   render={
                     <Link href={`/portal/services/${svc.id}`}>
                       View Details
@@ -180,29 +181,28 @@ export function ServicesList({
                   }
                   className="bg-forest text-primary-foreground hover:bg-forest-deep"
                 />
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={!isComplete}
-                  render={
-                    isComplete ? (
+                {isComplete ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    nativeButton={false}
+                    render={
                       <Link href={`/portal/services/${svc.id}#report`}>
                         <Download className="size-3.5" aria-hidden />
                         Download Report
                       </Link>
-                    ) : undefined
-                  }
-                >
-                  {!isComplete && (
-                    <>
-                      <Download className="size-3.5" aria-hidden />
-                      Download Report
-                    </>
-                  )}
-                </Button>
+                    }
+                  />
+                ) : (
+                  <Button size="sm" variant="outline" disabled>
+                    <Download className="size-3.5" aria-hidden />
+                    Download Report
+                  </Button>
+                )}
                 <Button
                   size="sm"
                   variant="outline"
+                  nativeButton={false}
                   render={
                     <Link href={`/portal/maps?field=${svc.fieldId}`}>
                       <MapIcon className="size-3.5" aria-hidden />
@@ -213,6 +213,7 @@ export function ServicesList({
                 <Button
                   size="sm"
                   variant="ghost"
+                  nativeButton={false}
                   render={
                     <Link
                       href={`/portal/book?service=${encodeURIComponent(svc.kind)}&field=${svc.fieldId}`}

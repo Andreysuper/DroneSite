@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { ArrowUpRight, MapPin, Plus, Ruler, Sprout } from 'lucide-react'
@@ -9,6 +8,7 @@ import {
   getFields,
   getServiceOrders,
 } from '@/lib/portal/demo-data'
+import { FieldMapView } from '@/components/portal/field-map'
 import { PageHeader } from '@/components/portal/page-header'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -32,7 +32,7 @@ export default async function FieldsPage() {
         title="My Fields"
         subtitle={`${fields.length} registered fields · ${totalAcres.toLocaleString('en-CA')} total acres`}
         action={
-          <Button render={<Link href="/portal/support" />}>
+          <Button nativeButton={false} render={<Link href="/portal/support" />}>
             <Plus className="size-4" aria-hidden />
             Add a field
           </Button>
@@ -49,12 +49,10 @@ export default async function FieldsPage() {
             <li key={field.id}>
               <Card className="group flex h-full flex-col overflow-hidden border-border/60 p-0 transition-shadow duration-200 hover:shadow-lg">
                 <div className="relative aspect-[16/10] overflow-hidden bg-muted">
-                  <Image
-                    src={field.mapImage}
-                    alt={`Aerial map of ${field.name}`}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  <FieldMapView
+                    variant={field.mapImage}
+                    seed={field.id}
+                    className="transition-transform duration-500 group-hover:scale-105"
                   />
                   <span className="absolute left-3 top-3 rounded-full bg-charcoal/80 px-2.5 py-1 text-xs font-semibold text-cream backdrop-blur-sm">
                     {field.cropType}

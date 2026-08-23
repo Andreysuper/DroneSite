@@ -1,7 +1,6 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import {
   ArrowLeft,
@@ -18,6 +17,7 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { FieldMapView } from '@/components/portal/field-map'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
@@ -207,10 +207,10 @@ export function BookingWizard({ fields }: { fields: Field[] }) {
           </div>
         </dl>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Button render={<Link href="/portal/services" />}>
+          <Button nativeButton={false} render={<Link href="/portal/services" />}>
             View my services
           </Button>
-          <Button variant="outline" render={<Link href="/portal" />}>
+          <Button variant="outline" nativeButton={false} render={<Link href="/portal" />}>
             Back to dashboard
           </Button>
         </div>
@@ -315,13 +315,7 @@ export function BookingWizard({ fields }: { fields: Field[] }) {
                     )}
                   >
                     <span className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-muted">
-                      <Image
-                        src={f.mapImage}
-                        alt=""
-                        fill
-                        sizes="64px"
-                        className="object-cover"
-                      />
+                      <FieldMapView variant={f.mapImage} seed={f.id} />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block font-semibold">{f.name}</span>
