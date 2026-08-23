@@ -114,7 +114,9 @@ export function MapsGallery({
           </Label>
           <Select value={reportType} onValueChange={setReportType}>
             <SelectTrigger id="map-type">
-              <SelectValue placeholder="All types" />
+              <SelectValue placeholder="All types">
+                {(value) => (value === 'all' ? 'All types' : value)}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All types</SelectItem>
