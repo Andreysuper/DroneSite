@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ArrowRight, Menu, X } from 'lucide-react'
+import { ArrowRight, Menu, UserRound, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useBooking } from './booking-provider'
+import { ClientLoginModal } from './client-login-modal'
 
 const NAV = [
   { label: 'Services', href: '#services' },
@@ -19,6 +20,7 @@ export function SiteHeader() {
   const { openEstimate } = useBooking()
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [loginOpen, setLoginOpen] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -61,7 +63,16 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden lg:block">
+        <div className="hidden items-center gap-3 lg:flex">
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={() => setLoginOpen(true)}
+            className="h-12 rounded-full border-cream/35 bg-transparent px-6 text-[0.95rem] font-semibold text-cream transition-all duration-200 hover:border-gold/60 hover:bg-cream/10 hover:text-gold"
+          >
+            <UserRound className="size-4" aria-hidden />
+            Client Login
+          </Button>
           <Button
             size="lg"
             onClick={() => openEstimate()}
@@ -97,17 +108,30 @@ export function SiteHeader() {
               </a>
             ))}
             <Button
+              variant="outline"
+              onClick={() => {
+                setMenuOpen(false)
+                setLoginOpen(true)
+              }}
+              className="mt-2 border-cream/35 bg-transparent text-cream hover:border-gold/60 hover:bg-cream/10 hover:text-gold"
+            >
+              <UserRound className="size-4" aria-hidden />
+              Client Login
+            </Button>
+            <Button
               onClick={() => {
                 setMenuOpen(false)
                 openEstimate()
               }}
-              className="mt-2 bg-gold text-accent-foreground hover:bg-gold/90"
+              className="mt-1 bg-gold text-accent-foreground hover:bg-gold/90"
             >
               Get Free Estimate
             </Button>
           </nav>
         </div>
       )}
+
+      <ClientLoginModal open={loginOpen} onOpenChange={setLoginOpen} />
     </header>
   )
 }
