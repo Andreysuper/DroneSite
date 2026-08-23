@@ -6,7 +6,26 @@ import { Select as SelectPrimitive } from "@base-ui/react/select"
 import { cn } from "@/lib/utils"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
-const Select = SelectPrimitive.Root
+/**
+ * Base UI reports `null` when a select is cleared, which is awkward for the
+ * common `useState<string>` case. This wrapper narrows `onValueChange` to a
+ * plain string and coalesces `null` to an empty string.
+ */
+function Select({
+  onValueChange,
+  ...props
+}: Omit<SelectPrimitive.Root.Props<string>, "onValueChange"> & {
+  onValueChange?: (value: string) => void
+}) {
+  return (
+    <SelectPrimitive.Root
+      onValueChange={
+        onValueChange ? (value) => onValueChange(value ?? "") : undefined
+      }
+      {...props}
+    />
+  )
+}
 
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   return (
