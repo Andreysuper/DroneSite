@@ -1,3 +1,4 @@
+import { Users } from 'lucide-react'
 import { requireCapability } from '@/lib/auth/session'
 import { SectionPlaceholder } from '@/components/admin/section-placeholder'
 
@@ -9,7 +10,7 @@ export default async function AdminCustomersPage() {
     <SectionPlaceholder
       title="Customers"
       description="Farm and grower accounts, their fields, contacts, and portal access. Link new signups to existing customer records."
-      phase="Phase 2"
+      icon={Users}
     />
   )
 }

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { sendMail } from '@/lib/mailer'
 import { buildEmailHtml } from '@/lib/email-template'
 import { getClientIp, rateLimit } from '@/lib/rate-limit'
+import { captureServiceRequest } from '@/lib/requests/capture'
 
 export const runtime = 'nodejs'
 
@@ -51,6 +52,35 @@ export async function POST(req: Request) {
     )
   }
 
+  // --- Persist FIRST (spec: every request must be stored) ---
+  const acresParsed = Number.parseFloat((data.fieldSize ?? '').replace(/[^0-9.]/g, ''))
+  let requestNumber = ''
+  try {
+    const captured = await captureServiceRequest({
+      source: 'website',
+      contactName: data.name,
+      contactEmail: data.email,
+      contactPhone: data.phone,
+      serviceType: data.service,
+      acres: Number.isFinite(acresParsed) ? acresParsed : null,
+      location: data.location,
+      preferredDate: data.date || null,
+      message: [
+        data.fieldSize && `Field size: ${data.fieldSize}`,
+        data.message,
+      ]
+        .filter(Boolean)
+        .join('\n'),
+    })
+    requestNumber = captured.requestNumber
+  } catch (err) {
+    console.error('[v0] Estimate capture failed:', err)
+    return NextResponse.json(
+      { error: 'Unable to submit request. Please try again later.' },
+      { status: 500 },
+    )
+  }
+
   const html = buildEmailHtml({
     heading: 'New Free Estimate Request',
     intro: `A new estimate request was submitted by ${data.name}.`,
@@ -79,19 +109,16 @@ export async function POST(req: Request) {
     ],
   })
 
+  // Email is best-effort — the request is already stored.
   try {
     await sendMail({
-      subject: 'New Free Estimate Request - AgroSkyTech',
+      subject: `New Free Estimate Request (${requestNumber}) - AgroSkyTech`,
       html,
       replyTo: data.email,
     })
   } catch (err) {
-    console.error('[v0] Estimate email failed:', err)
-    return NextResponse.json(
-      { error: 'Unable to send request. Please try again later.' },
-      { status: 502 },
-    )
+    console.error('[v0] Estimate email failed (request still stored):', err)
   }
 
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ success: true, requestNumber })
 }

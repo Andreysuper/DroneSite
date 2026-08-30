@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { sendMail, type MailAttachment } from '@/lib/mailer'
 import { buildEmailHtml } from '@/lib/email-template'
 import { getClientIp, rateLimit } from '@/lib/rate-limit'
+import { captureServiceRequest, type ProvidesProduct } from '@/lib/requests/capture'
 
 export const runtime = 'nodejs'
 
@@ -77,6 +78,53 @@ export async function POST(req: Request) {
       unsure: 'Not sure yet',
     }[get('provideProduct')] || get('provideProduct')
 
+  // --- Persist the request FIRST (spec: every request must be stored) ---
+  // Storage is the source of truth; email is a best-effort notification.
+  const providesProduct: ProvidesProduct =
+    get('provideProduct') === 'yes' ? 'yes' : 'unsure'
+  const acresParsed = Number.parseFloat(fieldSize.replace(/[^0-9.]/g, ''))
+
+  let requestNumber = ''
+  try {
+    const messageParts = [
+      get('serviceType') && `Service needed: ${get('serviceType')}`,
+      getAll('treatmentTargets').length &&
+        `Treatment targets: ${getAll('treatmentTargets').join(', ')}`,
+      get('urgency') && `Urgency: ${get('urgency')}`,
+      getAll('conditions').length &&
+        `Field conditions: ${getAll('conditions').join(', ')}`,
+      get('accessNotes') && `Access notes: ${get('accessNotes')}`,
+      getAll('productTypes').length &&
+        `Product types needed: ${getAll('productTypes').join(', ')}`,
+      get('additionalInfo') && `Notes: ${get('additionalInfo')}`,
+      attachments.length &&
+        `Attachments emailed: ${attachments.map((a) => a.filename).join(', ')}`,
+    ].filter(Boolean)
+
+    const captured = await captureServiceRequest({
+      source: 'website',
+      contactName: name,
+      contactEmail: email,
+      contactPhone: phone,
+      farmName: get('company'),
+      serviceType: get('serviceType'),
+      crop: get('surfaceType'),
+      acres: Number.isFinite(acresParsed) ? acresParsed : null,
+      location: [city, get('address')].filter(Boolean).join(' — '),
+      preferredDate: get('date') || null,
+      providesProduct,
+      productDetails: getAll('productTypes').join(', '),
+      message: messageParts.join('\n'),
+    })
+    requestNumber = captured.requestNumber
+  } catch (err) {
+    console.error('[v0] Booking capture failed:', err)
+    return NextResponse.json(
+      { error: 'Unable to submit request. Please try again later.' },
+      { status: 500 },
+    )
+  }
+
   const html = buildEmailHtml({
     heading: 'New Drone Service Booking Request',
     intro: `A detailed booking request was submitted by ${name}.`,
@@ -135,20 +183,18 @@ export async function POST(req: Request) {
     ],
   })
 
+  // Email is best-effort: the request is already safely stored, so a mail
+  // failure should not lose the lead or fail the customer's submission.
   try {
     await sendMail({
-      subject: 'New Drone Service Booking Request - AgroSkyTech',
+      subject: `New Drone Service Booking Request (${requestNumber}) - AgroSkyTech`,
       html,
       replyTo: email || undefined,
       attachments,
     })
   } catch (err) {
-    console.error('[v0] Booking email failed:', err)
-    return NextResponse.json(
-      { error: 'Unable to send request. Please try again later.' },
-      { status: 502 },
-    )
+    console.error('[v0] Booking email failed (request still stored):', err)
   }
 
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ success: true, requestNumber })
 }

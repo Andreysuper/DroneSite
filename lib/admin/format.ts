@@ -24,6 +24,21 @@ export function formatDate(iso: string | null): string {
   })
 }
 
+export function formatDateTime(iso: string | null): string {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleString('en-CA', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}
+
+export function formatAcres(acres: number): string {
+  return `${new Intl.NumberFormat('en-CA', { maximumFractionDigits: 1 }).format(acres)} ac`
+}
+
 export function formatRelative(iso: string): string {
   const then = new Date(iso).getTime()
   const diffMs = Date.now() - then

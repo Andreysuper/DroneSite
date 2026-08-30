@@ -1,3 +1,4 @@
+import { Wrench } from 'lucide-react'
 import { requireCapability } from '@/lib/auth/session'
 import { SectionPlaceholder } from '@/components/admin/section-placeholder'
 
@@ -9,7 +10,7 @@ export default async function AdminJobsPage() {
     <SectionPlaceholder
       title="Jobs"
       description="Scheduled field operations converted from approved requests. Assign operators, track live status, and close out completed work."
-      phase="Phase 2"
+      icon={Wrench}
     />
   )
 }

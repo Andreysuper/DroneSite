@@ -159,3 +159,99 @@ export async function getRequests(options?: {
   const { data } = await query.order('created_at', { ascending: false })
   return (data ?? []).map((r) => mapRequestRow(r as unknown as RawRequestRow))
 }
+
+export type RequestEvent = {
+  id: string
+  eventType: string
+  fromStatus: RequestStatus | null
+  toStatus: RequestStatus | null
+  note: string
+  isCustomerVisible: boolean
+  createdAt: string
+  actorName: string | null
+}
+
+export type AdminRequestDetail = AdminRequestRow & {
+  contactEmail: string
+  contactPhone: string
+  crop: string
+  preferredDate: string | null
+  providesProduct: string
+  productDetails: string
+  message: string
+  internalNotes: string
+  customerId: string | null
+  assignedToId: string | null
+  events: RequestEvent[]
+}
+
+const REQUEST_DETAIL_SELECT = `id, request_number, status, source, contact_name, contact_email,
+  contact_phone, farm_name, service_type, crop, acres, location, created_at,
+  preferred_date, provides_product, product_details, message, internal_notes,
+  quote_amount, customer_id, assigned_to,
+  assigned_profile:profiles!service_requests_assigned_to_fkey(full_name)`
+
+export async function getRequestDetail(
+  id: string,
+): Promise<AdminRequestDetail | null> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('service_requests')
+    .select(REQUEST_DETAIL_SELECT)
+    .eq('id', id)
+    .maybeSingle()
+
+  if (!data) return null
+  const row = data as Record<string, unknown>
+
+  const { data: eventRows } = await supabase
+    .from('request_events')
+    .select(
+      'id, event_type, from_status, to_status, note, is_customer_visible, created_at, actor:profiles!request_events_actor_id_fkey(full_name)',
+    )
+    .eq('request_id', id)
+    .order('created_at', { ascending: false })
+
+  const events: RequestEvent[] = (eventRows ?? []).map((e) => {
+    const ev = e as Record<string, unknown>
+    return {
+      id: String(ev.id),
+      eventType: String(ev.event_type),
+      fromStatus: (ev.from_status as RequestStatus) ?? null,
+      toStatus: (ev.to_status as RequestStatus) ?? null,
+      note: String(ev.note ?? ''),
+      isCustomerVisible: Boolean(ev.is_customer_visible),
+      createdAt: String(ev.created_at),
+      actorName:
+        (ev.actor as { full_name?: string } | null)?.full_name ?? null,
+    }
+  })
+
+  const assigned = row.assigned_profile as { full_name?: string } | null
+
+  return {
+    id: String(row.id),
+    requestNumber: String(row.request_number),
+    status: row.status as RequestStatus,
+    source: row.source as RequestSource,
+    contactName: String(row.contact_name ?? ''),
+    contactEmail: String(row.contact_email ?? ''),
+    contactPhone: String(row.contact_phone ?? ''),
+    farmName: String(row.farm_name ?? ''),
+    serviceType: String(row.service_type ?? ''),
+    crop: String(row.crop ?? ''),
+    acres: row.acres === null ? null : num(row.acres),
+    location: String(row.location ?? ''),
+    createdAt: String(row.created_at),
+    preferredDate: (row.preferred_date as string) ?? null,
+    providesProduct: String(row.provides_product ?? 'unsure'),
+    productDetails: String(row.product_details ?? ''),
+    message: String(row.message ?? ''),
+    internalNotes: String(row.internal_notes ?? ''),
+    quoteAmount: row.quote_amount === null ? null : num(row.quote_amount),
+    customerId: (row.customer_id as string) ?? null,
+    assignedToId: (row.assigned_to as string) ?? null,
+    assignedToName: assigned?.full_name ?? null,
+    events,
+  }
+}

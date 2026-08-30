@@ -1,3 +1,4 @@
+import { ShieldCheck } from 'lucide-react'
 import { requireCapability } from '@/lib/auth/session'
 import { SectionPlaceholder } from '@/components/admin/section-placeholder'
 
@@ -9,7 +10,7 @@ export default async function AdminStaffPage() {
     <SectionPlaceholder
       title="Staff & Roles"
       description="Invite team members, assign roles, and manage permissions across the platform. The primary Super Admin is protected from downgrade."
-      phase="Phase 4"
+      icon={ShieldCheck}
     />
   )
 }
