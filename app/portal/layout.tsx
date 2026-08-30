@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { getCurrentUser, getSession } from '@/lib/portal/auth'
+import { getAuthProfile } from '@/lib/auth/session'
+import { hasAdminAccess } from '@/lib/auth/roles'
 import {
   getNotifications,
   getOrganization,
@@ -28,6 +30,9 @@ export default async function PortalLayout({
   // Server-side guard: unauthenticated visitors never receive portal markup.
   if (!user || !session) redirect('/')
 
+  const profile = await getAuthProfile()
+  const canAccessAdmin = hasAdminAccess(profile?.role)
+
   const organizations = getOrganizations(user)
   const activeOrganization = getOrganization(session.organizationId)
   const notifications = getNotifications(activeOrganization.id)
@@ -41,6 +46,7 @@ export default async function PortalLayout({
           organizations={organizations}
           activeOrganization={activeOrganization}
           notifications={notifications}
+          canAccessAdmin={canAccessAdmin}
         />
         <main className="flex-1 px-4 pb-24 pt-6 sm:px-6 sm:pb-10 lg:px-8">
           <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">

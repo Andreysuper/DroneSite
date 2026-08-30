@@ -46,16 +46,8 @@ export async function updateSession(request: NextRequest) {
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
+    url.pathname = '/login'
     url.searchParams.set('next', pathname)
-    return NextResponse.redirect(url)
-  }
-
-  // Signed-in users have no reason to sit on the auth screens.
-  if (user && (pathname === '/auth/login' || pathname === '/auth/sign-up')) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/portal'
-    url.search = ''
     return NextResponse.redirect(url)
   }
 
