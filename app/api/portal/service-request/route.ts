@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/portal/auth'
+import { getAuthProfile } from '@/lib/auth/session'
 import { getOrganization } from '@/lib/portal/demo-data'
 import { getClientIp, rateLimit } from '@/lib/rate-limit'
 import { sendMail } from '@/lib/mailer'
 import { buildEmailHtml } from '@/lib/email-template'
+import { captureServiceRequest } from '@/lib/requests/capture'
+import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: Request) {
   const user = await getCurrentUser()
-  if (!user) {
+  const profile = await getAuthProfile()
+  if (!user || !profile) {
     return NextResponse.json({ error: 'Not authenticated.' }, { status: 401 })
   }
 
@@ -43,10 +47,63 @@ export async function POST(request: Request) {
     )
   }
 
-  const reference = `AST-${new Date().getFullYear()}-${
-    Math.floor(Math.random() * 9000) + 1000
-  }`
   const org = getOrganization(user.defaultOrganizationId)
+
+  // Link to the customer record this signed-in user owns, if any. RLS ensures
+  // they can only ever see their own customer row here.
+  const supabase = await createClient()
+  const { data: ownedCustomer } = await supabase
+    .from('customers')
+    .select('id')
+    .eq('profile_id', profile.id)
+    .maybeSingle()
+
+  const acresNum =
+    typeof body.acres === 'number'
+      ? body.acres
+      : Number.parseFloat(str('acres')) || null
+
+  // --- Persist FIRST (spec: every request must be stored) ---
+  let reference = ''
+  try {
+    const captured = await captureServiceRequest({
+      source: 'customer_portal',
+      submittedBy: profile.id,
+      customerId: ownedCustomer?.id ?? null,
+      contactName: user.name,
+      contactEmail: user.email,
+      contactPhone: user.phone ?? '',
+      farmName: org?.name ?? '',
+      serviceType: kind,
+      location: str('fieldAddress'),
+      acres: acresNum,
+      preferredDate: preferredDate || null,
+      providesProduct: str('suppliedBy').toLowerCase().includes('client')
+        ? 'yes'
+        : 'unsure',
+      productDetails: product,
+      message: [
+        `Field: ${fieldName}`,
+        str('alternateDate') && `Alternate date: ${str('alternateDate')}`,
+        str('timeWindow') && `Time window: ${str('timeWindow')}`,
+        str('urgency') && `Urgency: ${str('urgency')}`,
+        str('rate') && `Application rate: ${str('rate')}`,
+        str('suppliedBy') && `Supplied by: ${str('suppliedBy')}`,
+        str('notes') && `Notes: ${str('notes')}`,
+        typeof body.estimate === 'number' &&
+          `System estimate: $${(body.estimate as number).toFixed(2)} CAD`,
+      ]
+        .filter(Boolean)
+        .join('\n'),
+    })
+    reference = captured.requestNumber
+  } catch (error) {
+    console.log('[v0] Portal service request capture failed:', error)
+    return NextResponse.json(
+      { error: 'Unable to submit request. Please try again later.' },
+      { status: 500 },
+    )
+  }
 
   try {
     const html = buildEmailHtml({

@@ -14,6 +14,7 @@ import {
   LogOut,
   Menu,
   Settings,
+  ShieldCheck,
   Wallet,
   CloudRain,
   Wrench,
@@ -51,11 +52,13 @@ export function PortalTopbar({
   organizations,
   activeOrganization,
   notifications,
+  canAccessAdmin = false,
 }: {
   user: PortalUser
   organizations: Organization[]
   activeOrganization: Organization
   notifications: Notification[]
+  canAccessAdmin?: boolean
 }) {
   const { logout } = useLogout()
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -135,6 +138,21 @@ export function PortalTopbar({
       </DropdownMenu>
 
       <div className="flex-1" />
+
+      {/* Administration entry point — only for staff with admin access */}
+      {canAccessAdmin && (
+        <Button
+          nativeButton={false}
+          size="sm"
+          render={
+            <Link href="/admin">
+              <ShieldCheck className="size-4" aria-hidden />
+              <span className="hidden sm:inline">Administration</span>
+            </Link>
+          }
+          className="gap-1.5 border border-gold/40 bg-gold/10 text-charcoal hover:bg-gold/20"
+        />
+      )}
 
       {/* Notifications */}
       <DropdownMenu>
